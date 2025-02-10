@@ -33,11 +33,12 @@ class Node:
                   metrics=['mse'])
 
     def load_data(self, data):
-        """Imports dataset in node and does preprocessing."""
+        """Imports dataset into node and does preprocessing."""
 
+        # Compute FinancialStatus
         data['FinancialStatus'] = data['FinancialEducation'] * np.log(data['Wealth'])
 
-        # Define the target column (the column you want to predict)
+        # Define the target column
         target_column = 'RiskPropensity'
 
         # Separate the features (X) and the target (y)
@@ -54,7 +55,7 @@ class Node:
         # Fit the scaler on X and transform X
         X_scaled = scaler.fit_transform(X)
 
-        # Split the data into training and testing sets (75% training, 25% testing)
+        # Split the data into training and testing sets (80% training, 20% testing)
         self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(X_scaled, y, test_size=0.20, random_state=42)
 
     def train(self):
@@ -70,10 +71,12 @@ class Node:
         return  self.X_test, self.y_test
 
     def save_model(self):
+        # Save model as .keras and .h5
         self.model.save('/Users/antonelloamore/PycharmProjects/ray-fed-training/fed-model.keras')
         self.model.save('/Users/antonelloamore/PycharmProjects/ray-fed-training/fed-model.h5')
 
     def evaluate(self, X_test, y_test):
+        # Compute global loss
         global_loss = self.model.evaluate(X_test, y_test)
         print(f"Global Model Evaluation - Loss: {global_loss}")
 
@@ -131,11 +134,13 @@ def run(party):
     for i in range(ITERATIONS):
         print(f"Iteration {i+1}")
 
-        # Local train
         for i in range(1, NUM_PARTIES):
+            # Updating local weights
             parties[i].set_weights.remote(global_weights)
+            # Local train
             parties[i].train.remote()
 
+        # Weight aggregation and averaging
         local_weights = [parties[i].get_weights.remote() for i in range(NUM_PARTIES)]
         w_mean = avg_weights.party("server").remote(local_weights)
 
