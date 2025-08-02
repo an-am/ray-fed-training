@@ -7,5 +7,5 @@ to jointly train models without sharing raw data. By leveraging Ray Core, RayFed
 Ray’s scheduling, distributed object store and resource management features for scaling
 machine learning tasks. More on RayFed [here](https://github.com/ray-project/rayfed).
 
-A **fixed set** of federated clients train their local neural network on their own dataset, satisfying **data locality** principles.
+In this implementation, a **fixed set** of federated clients train their local neural network on their own dataset, satisfying **data locality** principles.
 A **server** aggregates new model weights, following the **Federated Averaging** algorithm, for a total of 10 rounds.
